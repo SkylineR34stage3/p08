@@ -10,6 +10,7 @@ except ImportError:
 
 try:
     import numpy as np
+    import numpy.typing as npt
     NUMPY_VERSION = np.__version__
     NUMPY_OK = True
 except ImportError:
@@ -61,7 +62,7 @@ def check_dependencies() -> bool:
     return all_ok
 
 
-def generate_data(n: int) -> "np.ndarray":
+def generate_data(n: int) -> "npt.NDArray[np.float64]":
     # repoducibility
     np.random.seed(42)
 
@@ -81,17 +82,18 @@ def generate_data(n: int) -> "np.ndarray":
     glitch_indices = np.random.randint(0, n, 15)
     combined[glitch_indices] += np.random.choice([-1, 1], 15) * 4
 
-    print(f"Processing {n} data point...")
+    print(f"\nProcessing {n} data point...")
 
     # stack into a 2D array
     return np.column_stack([t, base, noise, combined])
 
 
-def analyse_data(data: "np.ndarray") -> "pd.DataFrame":
+def analyse_data(data: "npt.NDArray[np.float64]") -> "pd.DataFrame":
     print("Analyzing Matrix data...")
 
     # create DataFrame from numpy - column names map to the 4 array columns
-    df = pd.DataFrame(data, columns=["time", "base_signal", "noise", "combined"])
+    df = pd.DataFrame(data,
+                      columns=["time", "base_signal", "noise", "combined"])
 
     # anomaly column - boolean mask where signal deviates too far
     # df["anomaly"] = df["combined"].abs() > 3.0
@@ -119,15 +121,27 @@ def visualise(df: "pd.DataFrame") -> None:
 
     # signal over time with anomalies and rolling mean:
     # raw combined signal
-    axes[0].plot(df["time"], df["combined"], color="green", alpha=0.6, label="Signal")
+    axes[0].plot(df["time"],
+                 df["combined"],
+                 color="green",
+                 alpha=0.6,
+                 label="Signal")
 
     # rolling mean overlay
-    axes[0].plot(df["time"], df["rolling_mean"], color="cyan", linewidth=2, label="Rolling mean")
+    axes[0].plot(df["time"],
+                 df["rolling_mean"],
+                 color="cyan",
+                 linewidth=2,
+                 label="Rolling mean")
 
     # anomalies as red dots
     # boolean indexing to filter only anomaly rows
     anomalies = df[df["anomaly"]]
-    axes[0].scatter(anomalies["time"], anomalies["combined"], color="red", zorder=5, label="Anomaly")
+    axes[0].scatter(anomalies["time"],
+                    anomalies["combined"],
+                    color="red",
+                    zorder=5,
+                    label="Anomaly")
 
     axes[0].set_title("Matrix Code Stream")
     axes[0].set_xlabel("Time")
@@ -135,7 +149,11 @@ def visualise(df: "pd.DataFrame") -> None:
     axes[0].legend()
 
     # signal distribution histogram:
-    axes[1].hist(df["combined"], bins=40, color="green", alpha=0.7, edgecolor="black")
+    axes[1].hist(df["combined"],
+                 bins=40,
+                 color="green",
+                 alpha=0.7,
+                 edgecolor="black")
     axes[1].set_title("Signal Distribution")
     axes[1].set_xlabel("Amplitude")
     axes[1].set_ylabel("Frequency")
