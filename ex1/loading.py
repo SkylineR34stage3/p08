@@ -165,6 +165,13 @@ def visualise(df: "pd.DataFrame") -> None:
     print("Results saved to: matrix_analysis.png")
 
 
+def compare_managers() -> None:
+    print("\nPackage manager comparison:",
+          "pip\t-> uses requirements.txt | flat list | no lock file",
+          "poetry\t-> uses pyproject.toml | dependency graph | poetry.lock",
+          sep="\n")
+
+
 def main() -> None:
     print("\nLOADING STATUS: Loading programs...\n")
     if not check_dependencies():
@@ -177,6 +184,7 @@ def main() -> None:
     df = analyse_data(data)
     visualise(df)
     print("\nAnalysis complete!")
+    compare_managers()
 
 
 if __name__ == "__main__":
