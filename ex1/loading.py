@@ -97,13 +97,10 @@ def analyse_data(data: "npt.NDArray[np.float64]") -> "pd.DataFrame":
 
     # anomaly column - boolean mask where signal deviates too far
     # df["anomaly"] = df["combined"].abs() > 3.0
-    rolling_mean = df["combined"].rolling(window=20).mean()
-    rolling_std = df["combined"].rolling(window=20).std()
-    z_score = (df["combined"] - rolling_mean) / rolling_std
-    df["anomaly"] = z_score.abs() > 2.5
-
-    # rolling mean over a 20-point window - smoother signal
     df["rolling_mean"] = df["combined"].rolling(window=20).mean()
+    rolling_std = df["combined"].rolling(window=20).std()
+    z_score = (df["combined"] - df["rolling_mean"]) / rolling_std
+    df["anomaly"] = z_score.abs() > 2.5
 
     anomaly_count = df["anomaly"].sum()
     print(f"  Signal mean:\t{df['combined'].mean():.4f}")
