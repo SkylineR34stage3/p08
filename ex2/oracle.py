@@ -1,33 +1,20 @@
 from dotenv import load_dotenv
 import os
-import sys
 
 
 def parse_configuration() -> tuple[str, str, str, str, str]:
-    matrix_mode = os.environ.get("MATRIX_MODE")
-    if not matrix_mode:
-        print("ERROR: MATRIX_MODE is not set")
-        sys.exit(1)
+    matrix_mode = os.environ.get("MATRIX_MODE", "development")
+    database_url = os.environ.get("DATABASE_URL", "")
+    api_key = os.environ.get("API_KEY", "")
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    zion_endpoint = os.environ.get("ZION_ENDPOINT", "")
 
-    database_url = os.environ.get("DATABASE_URL")
-    if not database_url:
-        print("ERROR: DATABASE_URL is not set")
-        sys.exit(1)
-
-    api_key = os.environ.get("API_KEY")
     if not api_key:
-        print("ERROR: API_KEY is not set")
-        sys.exit(1)
-
-    log_level = os.environ.get("LOG_LEVEL")
-    if not log_level:
-        print("ERROR: LOG_LEVEL is not set")
-        sys.exit(1)
-
-    zion_endpoint = os.environ.get("ZION_ENDPOINT")
+        print("WARNING: API_KEY not set — API access disabled")
+    if not database_url:
+        print("WARNING: DATABASE_URL not set — no database configured")
     if not zion_endpoint:
-        print("ERROR: ZION_ENDPOINT is not set")
-        sys.exit(1)
+        print("WARNING: ZION_ENDPOINT not set — network offline")
 
     return (matrix_mode, database_url, api_key, log_level, zion_endpoint)
 
@@ -67,9 +54,7 @@ def print_security_check() -> None:
 def main() -> None:
     print("\nORACLE STATUS: Reading the Matrix...\n")
 
-    if not load_dotenv():
-        print("[KO] Cannot load .env (probably mising)")
-        sys.exit(1)
+    load_dotenv()
 
     print_configuration(*parse_configuration())
 
