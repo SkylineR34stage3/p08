@@ -24,19 +24,35 @@ def print_configuration(matrix_mode: str,
                         api_key: str,
                         log_level: str,
                         zion_endpoint: str) -> None:
+    is_prod = matrix_mode == "production"
+    if is_prod:
+        print("[PRODUCTION MODE] Sensitive values are masked\n")
+
     print("Configuration loaded:")
     if database_url:
-        database_status = "Connected to local instance"
+        if is_prod:
+            database_status = "Connected to remote instance [REDACTED]"
+        else:
+            database_status = f"Connected to local instance ({database_url})"
     else:
         database_status = "Not reachable"
+
     if api_key:
-        api_access = f"Authenticated with {api_key[:4]}...{api_key[-4:]}"
+        if is_prod:
+            api_access = "Authenticated [REDACTED]"
+        else:
+            api_access = f"Authenticated with {api_key[:4]}...{api_key[-4:]}"
     else:
         api_access = "Forbidden"
+
     if zion_endpoint:
-        zion_status = "Online"
+        if is_prod:
+            zion_status = "Online"
+        else:
+            zion_status = f"Online at {zion_endpoint}"
     else:
         zion_status = "Offline"
+
     print(f"Mode: {matrix_mode}",
           f"Database: {database_status}",
           f"API Access: {api_access}",
