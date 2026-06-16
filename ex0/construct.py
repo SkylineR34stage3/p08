@@ -33,7 +33,7 @@ def main() -> None:
               "Safe to install packages without affecting",
               "the global system.",
               "\nPackage installation path:",
-              site.getusersitepackages(), sep="\n")
+              site.getsitepackages()[0], sep="\n")
 
 
 if __name__ == "__main__":
