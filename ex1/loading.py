@@ -94,7 +94,11 @@ def analyse_data(data: "np.ndarray") -> "pd.DataFrame":
     df = pd.DataFrame(data, columns=["time", "base_signal", "noise", "combined"])
 
     # anomaly column - boolean mask where signal deviates too far
-    df["anomaly"] = df["combined"].abs() > 3.0
+    # df["anomaly"] = df["combined"].abs() > 3.0
+    rolling_mean = df["combined"].rolling(window=20).mean()
+    rolling_std = df["combined"].rolling(window=20).std()
+    z_score = (df["combined"] - rolling_mean) / rolling_std
+    df["anomaly"] = z_score.abs() > 2.5
 
     # rolling mean over a 20-point window - smoother signal
     df["rolling_mean"] = df["combined"].rolling(window=20).mean()
